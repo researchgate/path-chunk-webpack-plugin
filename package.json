@@ -1,11 +1,8 @@
 {
   "name": "path-chunk-webpack-plugin",
   "version": "0.1.0",
-  "description": "tbd",
+  "description": "Plugin to create named chunks based on regular expression or string matches against the module path.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/researchgate/path-chunk-webpack-plugin.git"
