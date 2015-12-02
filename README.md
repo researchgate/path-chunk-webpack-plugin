@@ -14,6 +14,25 @@ One of our main concerns about Webpack plugins is performance. That's why we cho
 The mode is chosen based on what type of `value` is supplied as option. If a regex is supplied as `value` we obviously run a match
 against the path. If on the other hand you supply a string `value` then we simply do an `indexOf` check.
 
+## Options
+
+```
+{
+  name: String,
+  filename: String,
+  value: String|RegExp
+}
+```
+
+#### name : String
+The name of the chunk. If `filename` is not provided, the chunk will be named according to your webpack `output` settings.
+
+#### filename : String
+The filename of the chunk. You can also use the same replacement values as you can do for the `filename` in the webpack `output` settings.
+
+#### value : String|RegExp
+This is the value that is checked against the complete absolute path of the module. If `value` is a string it is checked with ```String.indexOf(value)``` otherwise if it is a regular expression it is checked with ```String.match(value)```.
+
 ## Example
 
 ```js
