@@ -1,0 +1,28 @@
+{
+  "name": "path-chunk-webpack-plugin",
+  "version": "0.1.0",
+  "description": "tbd",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/researchgate/path-chunk-webpack-plugin.git"
+  },
+  "keywords": [
+    "webpack",
+    "plugin",
+    "path"
+  ],
+  "author": "Daniel Tschinder (@danez)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/researchgate/path-chunk-webpack-plugin/issues"
+  },
+  "homepage": "https://github.com/researchgate/path-chunk-webpack-plugin#readme",
+  "devDependencies": {
+    "eslint": "^1.10.3",
+    "eslint-config-airbnb": "^1.0.2"
+  }
+}
