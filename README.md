@@ -6,13 +6,13 @@ create multiple chunks. It is based on the CommonsChunkPlugin from Webpack.
 The main use case it is used in our company is splitting less frequent changed code into separate chunks. With this plugin we
 are able to split our codebase into `vendor`(node_modules), `core-libraries`, `react-base-components` and more.
 
-This plugin works by matching the supplied value against the full path of all modules. We also check all bundles and not only entry bundles as entry bundles in our configuration do not contain modules.
+This plugin works by matching the supplied `test` against the full path of all modules. We also check all bundles and not only entry bundles as entry bundles in our configuration do not contain modules.
 
 ## Performance
 
 One of our main concerns about Webpack plugins is performance. That's why we choose to have two operating modes in this plugin.
-The mode is chosen based on what type of `value` is supplied as option. If a regex is supplied as `value` we obviously run a match
-against the path. If on the other hand you supply a string `value` then we simply do an `indexOf` check.
+The mode is chosen based on what type of `test` is supplied as option. If a regex is supplied as `test` we obviously run a match
+against the path. If on the other hand you supply a string `test` then we simply do an `indexOf` check.
 
 ## Options
 
@@ -20,7 +20,7 @@ against the path. If on the other hand you supply a string `value` then we simpl
 {
   name: String,
   filename: String,
-  value: String|RegExp
+  test: Function|String|RegExp
 }
 ```
 
@@ -30,8 +30,8 @@ The name of the chunk. If `filename` is not provided, the chunk will be named ac
 #### filename : String
 The filename of the chunk. You can also use the same replacement values as you can do for the `filename` in the webpack `output` settings.
 
-#### value : String|RegExp
-This is the value that is checked against the complete absolute path of the module. If `value` is a string it is checked with ```String.indexOf(value)``` otherwise if it is a regular expression it is checked with ```String.match(value)```.
+#### test : Function|String|RegExp
+This is the test that is checked against the complete absolute path of the module. If `test` is a function it is executed with the path as first parameter, if it is a string it is checked with ```String.indexOf(test)``` otherwise if it is a regular expression it is checked with ```String.match(test)```.
 
 ## Example
 
@@ -49,7 +49,7 @@ module.exports = {
   plugins: [
     new PathChunkPlugin({
       name: 'vendor',
-      value: 'node_modules/'
+      test: 'node_modules/'
     })
   ]
 };

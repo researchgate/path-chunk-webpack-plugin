@@ -7,7 +7,7 @@ var nextIdent = 0;
 function PathChunkPlugin(options) {
   this.chunkName = options.name;
   this.filenameTemplate = options.filename;
-  this.value = options.value;
+  this.test = options.test;
   this.ident = __filename + (nextIdent++);
 }
 
@@ -16,7 +16,7 @@ PathChunkPlugin.prototype.apply = function(compiler) {
   var filenameTemplate = this.filenameTemplate;
   var chunkName = this.chunkName;
   var ident = this.ident;
-  var value = this.value;
+  var test = this.test;
   compiler.plugin('compilation', function(compilation) {
     compilation.plugin('optimize-chunks', function(chunks) {
       // only optimize once
@@ -37,10 +37,12 @@ PathChunkPlugin.prototype.apply = function(compiler) {
       });
 
       var isModuleMatching;
-      if (value instanceof RegExp) {
-        isModuleMatching = function(userRequest) { return userRequest.match(value); };
+      if (typeof test === 'function') {
+        isModuleMatching = test;
+      } else if (typeof test === 'string') {
+        isModuleMatching = function(userRequest) { return userRequest.indexOf(test) >= 0; };
       } else {
-        isModuleMatching = function(userRequest) { return userRequest.indexOf(value) >= 0; };
+        isModuleMatching = function(userRequest) { return userRequest.match(test); };
       }
 
       var commonModules = [];
