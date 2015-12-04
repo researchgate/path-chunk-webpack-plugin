@@ -1,7 +1,7 @@
 {
   "name": "path-chunk-webpack-plugin",
   "version": "1.0.0",
-  "description": "Plugin to create named chunks based on regular expression or string matches against the module path.",
+  "description": "Plugin to create a chunk based on matching against the module path.",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -10,6 +10,8 @@
   "keywords": [
     "webpack",
     "plugin",
+    "chunk",
+    "output",
     "path"
   ],
   "author": "Daniel Tschinder (@danez)",
