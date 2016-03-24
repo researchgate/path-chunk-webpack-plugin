@@ -17,33 +17,36 @@ PathChunkPlugin.prototype.apply = function(compiler) {
   var chunkName = this.chunkName;
   var ident = this.ident;
   var test = this.test;
+
+  var isModuleMatching;
+  if (typeof test === 'function') {
+    isModuleMatching = test;
+  } else if (typeof test === 'string') {
+    isModuleMatching = function(userRequest) { return userRequest.indexOf(test) >= 0; };
+  } else if (test instanceof RegExp) {
+    isModuleMatching = function(userRequest) { return test.test(userRequest); };
+  } else {
+    throw new Error('Invalid test supplied to path-chunk-webpack-plugin');
+  }
+
   compiler.plugin('compilation', function(compilation) {
     compilation.plugin('optimize-chunks', function(chunks) {
       // only optimize once
       if (compilation[ident]) return;
       compilation[ident] = true;
 
-      var pathChunk = chunks.filter(function(chunk) {
+      var pathChunk = chunks.find(function(chunk) {
         return chunk.name === chunkName;
-      })[0];
+      });
+
       if (!pathChunk) {
         pathChunk = this.addChunk(chunkName);
         pathChunk.initial = pathChunk.entry = true;
       }
 
       var usedChunks = chunks.filter(function(chunk) {
-        if (chunk === pathChunk) return false;
-        return true;
+        return chunk !== pathChunk;
       });
-
-      var isModuleMatching;
-      if (typeof test === 'function') {
-        isModuleMatching = test;
-      } else if (typeof test === 'string') {
-        isModuleMatching = function(userRequest) { return userRequest.indexOf(test) >= 0; };
-      } else {
-        isModuleMatching = function(userRequest) { return userRequest.match(test); };
-      }
 
       var commonModules = [];
       var addCommonModule = function(module) {
@@ -54,22 +57,17 @@ PathChunkPlugin.prototype.apply = function(compiler) {
 
       usedChunks.forEach(function(chunk) {
         chunk.modules.forEach(addCommonModule);
-      });
-
-      commonModules.forEach(function(module) {
-        usedChunks.forEach(function(chunk) {
-          module.removeChunk(chunk);
-        });
-        pathChunk.addModule(module);
-        module.addChunk(pathChunk);
-      });
-
-      usedChunks.forEach(function(chunk) {
         chunk.parents = [pathChunk];
         pathChunk.chunks.push(chunk);
         if (chunk.entry) {
           chunk.entry = false;
         }
+      });
+
+      commonModules.forEach(function(module) {
+        usedChunks.forEach(module.removeChunk);
+        pathChunk.addModule(module);
+        module.addChunk(pathChunk);
       });
 
       if (filenameTemplate) {
