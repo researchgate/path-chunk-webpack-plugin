@@ -78,7 +78,7 @@ PathChunkPlugin.prototype.apply = function (compiler) {
       });
 
       commonModules.forEach(function (module) {
-        usedChunks.forEach(module.removeChunk);
+        usedChunks.forEach(module.removeChunk.bind(module));
         pathChunk.addModule(module);
         module.addChunk(pathChunk);
       });
