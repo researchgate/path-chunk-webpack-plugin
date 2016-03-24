@@ -53,7 +53,9 @@ PathChunkPlugin.prototype.apply = function (compiler) {
       }
 
       var usedChunks = chunks.filter(function (chunk) {
-        return chunk !== pathChunk;
+        // ignore chunk "main" as this is the name of chunk coming
+        // from worker-loader
+        return chunk !== pathChunk && chunk.name !== 'main';
       });
 
       var commonModules = [];
