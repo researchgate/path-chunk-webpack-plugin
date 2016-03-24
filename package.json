@@ -1,6 +1,6 @@
 {
   "name": "path-chunk-webpack-plugin",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Plugin to create a chunk based on matching against the module path.",
   "main": "index.js",
   "repository": {
