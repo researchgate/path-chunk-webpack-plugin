@@ -7,35 +7,43 @@ var nextIdent = 0;
 function PathChunkPlugin(options) {
   this.chunkName = options.name;
   this.filenameTemplate = options.filename;
-  this.test = options.test;
+  this.ignore = options.ignore || [];
   this.ident = __filename + (nextIdent++);
-}
 
-module.exports = PathChunkPlugin;
-PathChunkPlugin.prototype.apply = function(compiler) {
-  var filenameTemplate = this.filenameTemplate;
-  var chunkName = this.chunkName;
-  var ident = this.ident;
-  var test = this.test;
+  if (!this.chunkName) {
+    throw new Error('Supplying a name is mandatory for path-chunk-webpack-plugin');
+  }
 
-  var isModuleMatching;
-  if (typeof test === 'function') {
-    isModuleMatching = test;
-  } else if (typeof test === 'string') {
-    isModuleMatching = function(userRequest) { return userRequest.indexOf(test) >= 0; };
-  } else if (test instanceof RegExp) {
-    isModuleMatching = function(userRequest) { return test.test(userRequest); };
+  if (!Array.isArray(this.ignore)) {
+    this.ignore = [this.ignore];
+  }
+
+  if (typeof options.test === 'function') {
+    this.test = options.test;
+  } else if (typeof options.test === 'string') {
+    this.test = function (userRequest) { return userRequest.indexOf(options.test) >= 0; };
+  } else if (options.test instanceof RegExp) {
+    this.test = options.test.test;
   } else {
     throw new Error('Invalid test supplied to path-chunk-webpack-plugin');
   }
+}
 
-  compiler.plugin('compilation', function(compilation) {
-    compilation.plugin('optimize-chunks', function(chunks) {
+module.exports = PathChunkPlugin;
+PathChunkPlugin.prototype.apply = function (compiler) {
+  var filenameTemplate = this.filenameTemplate;
+  var chunkName = this.chunkName;
+  var ident = this.ident;
+  var ignore = this.ignore;
+  var isModuleMatching = this.test;
+
+  compiler.plugin('compilation', function (compilation) {
+    compilation.plugin('optimize-chunks', function (chunks) {
       // only optimize once
       if (compilation[ident]) return;
       compilation[ident] = true;
 
-      var pathChunk = chunks.find(function(chunk) {
+      var pathChunk = chunks.find(function (chunk) {
         return chunk.name === chunkName;
       });
 
@@ -44,18 +52,23 @@ PathChunkPlugin.prototype.apply = function(compiler) {
         pathChunk.initial = pathChunk.entry = true;
       }
 
-      var usedChunks = chunks.filter(function(chunk) {
+      var usedChunks = chunks.filter(function (chunk) {
         return chunk !== pathChunk;
       });
 
       var commonModules = [];
-      var addCommonModule = function(module) {
-        if (commonModules.indexOf(module) < 0 && module.userRequest && isModuleMatching(module.userRequest)) {
+      var addCommonModule = function (module) {
+        if (!module.userRequest) return;
+
+        for (var i in ignore) {
+          if (module.userRequest.indexOf(ignore[i]) >= 0) return;
+        }
+        if (commonModules.indexOf(module) < 0 && isModuleMatching(module.userRequest)) {
           commonModules.push(module);
         }
       };
 
-      usedChunks.forEach(function(chunk) {
+      usedChunks.forEach(function (chunk) {
         chunk.modules.forEach(addCommonModule);
         chunk.parents = [pathChunk];
         pathChunk.chunks.push(chunk);
@@ -64,7 +77,7 @@ PathChunkPlugin.prototype.apply = function(compiler) {
         }
       });
 
-      commonModules.forEach(function(module) {
+      commonModules.forEach(function (module) {
         usedChunks.forEach(module.removeChunk);
         pathChunk.addModule(module);
         module.addChunk(pathChunk);

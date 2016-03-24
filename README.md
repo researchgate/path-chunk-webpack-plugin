@@ -27,11 +27,14 @@ against the path. If on the other hand you supply a string `test` then we simply
 #### name : String
 The name of the chunk. If `filename` is not provided, the chunk will be named according to your webpack `output` settings.
 
-#### filename : String
+#### test : Function|String|RegExp
+This is the test that is checked against the complete absolute path of the module. If `test` is a function it is executed with the path as first parameter, if it is a string it is checked with ```String.indexOf(test)``` otherwise if it is a regular expression it is checked with ```test.test(String)```.
+
+#### filename : [String] 
 The filename of the chunk. You can also use the same replacement values as you can do for the `filename` in the webpack `output` settings.
 
-#### test : Function|String|RegExp
-This is the test that is checked against the complete absolute path of the module. If `test` is a function it is executed with the path as first parameter, if it is a string it is checked with ```String.indexOf(test)``` otherwise if it is a regular expression it is checked with ```String.match(test)```.
+#### ignore : String|Array<String>
+Names of modules you don't want to be included in the splitted chunk.
 
 ## Example
 
