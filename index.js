@@ -8,15 +8,16 @@ function PathChunkPlugin(options) {
   this.chunkName = options.name;
   this.filenameTemplate = options.filename;
   this.ignore = options.ignore || [];
+  // ignore chunk "main" by default as this is the name of chunk coming from worker-loader
+  this.ignoreChunks = options.ignoreChunks || ['main'];
   this.ident = __filename + (nextIdent++);
 
   if (!this.chunkName) {
     throw new Error('Supplying a name is mandatory for path-chunk-webpack-plugin');
   }
 
-  if (!Array.isArray(this.ignore)) {
-    this.ignore = [this.ignore];
-  }
+  if (!Array.isArray(this.ignore)) this.ignore = [this.ignore];
+  if (!Array.isArray(this.ignoreChunks)) this.ignoreChunks = [this.ignoreChunks];
 
   if (typeof options.test === 'function') {
     this.test = options.test;
@@ -35,6 +36,7 @@ PathChunkPlugin.prototype.apply = function (compiler) {
   var chunkName = this.chunkName;
   var ident = this.ident;
   var ignore = this.ignore;
+  var ignoreChunks = this.ignoreChunks;
   var isModuleMatching = this.test;
 
   compiler.plugin('compilation', function (compilation) {
@@ -53,9 +55,7 @@ PathChunkPlugin.prototype.apply = function (compiler) {
       }
 
       var usedChunks = chunks.filter(function (chunk) {
-        // ignore chunk "main" as this is the name of chunk coming
-        // from worker-loader
-        return chunk !== pathChunk && chunk.name !== 'main';
+        return chunk !== pathChunk && ignoreChunks.indexOf(chunk.name) === -1;
       });
 
       var commonModules = [];

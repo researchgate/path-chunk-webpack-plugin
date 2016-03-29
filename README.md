@@ -33,8 +33,11 @@ This is the test that is checked against the complete absolute path of the modul
 #### filename : [String] 
 The filename of the chunk. You can also use the same replacement values as you can do for the `filename` in the webpack `output` settings.
 
-#### ignore : String|Array<String>
-Names of modules you don't want to be included in the splitted chunk.
+#### ignore : [String|Array<String>]
+Names of modules you don't want to be included in the splitted chunk. By default this is empty.
+
+#### ignoreChunks : [String|Array<String>]
+Names of chunks which should stay untouched. By default this is set to `['main']`, which includes the `main` chunk from the worker-loader.
 
 ## Example
 
