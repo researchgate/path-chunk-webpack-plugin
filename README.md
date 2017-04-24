@@ -1,5 +1,7 @@
 # PathChunkPlugin for Webpack
 
+## UNMAINTAINED - This plugin is not maintained and deprecated. Use CommonsChunkPlugin with a callback function for minChunks. see https://webpack.js.org/plugins/commons-chunk-plugin/#passing-the-minchunks-property-a-function
+
 This plugin will extract all modules that match into a new named chunk. This plugin can also be used multiple times to
 create multiple chunks. It is based on the CommonsChunkPlugin from Webpack.
 
